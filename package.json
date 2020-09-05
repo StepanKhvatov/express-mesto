@@ -1,0 +1,29 @@
+{
+  "name": "express-mesto",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "app.js",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/StepanKhvatov/express-mesto.git"
+  },
+  "author": "StepanKhvatov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/StepanKhvatov/express-mesto.git"
+  },
+  "homepage": "",
+  "devDependencies": {
+    "eslint": "^7.8.1",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.0",
+    "nodemon": "^2.0.4"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
