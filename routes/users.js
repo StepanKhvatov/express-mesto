@@ -1,27 +1,36 @@
-const fs = require('fs');
 const users = require('express').Router();
 const path = require('path');
+const { getAllUsers } = require('../helpers/read-file');
 
 users.get('/users', (req, res) => {
-  fs.readFile(path.join(__dirname, '../data', 'users.json'), { encoding: 'utf-8' }, (err, data) => {
-    if (err) {
-      res.status(404).send({ message: err });
-      return;
-    }
-    const usersData = JSON.parse(data);
-    res.send(usersData);
-  });
+  try {
+    getAllUsers(path.join(__dirname, '../data', 'users.json'))
+      .then(
+        (data) => res.send(data),
+        (error) => res.status(500).send({ message: error.message }),
+      );
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
 });
 
 users.get('/users/:id', (req, res) => {
-  fs.readFile('./data/users.json', { encoding: 'utf-8' }, (err, data) => {
-    const usersData = JSON.parse(data);
-    if (!usersData[req.params.id]) {
-      res.status(404).send({ message: 'Нет пользователя с таким id' });
-      return;
-    }
-    res.send(usersData[req.params.id]);
-  });
+  try {
+    getAllUsers(path.join(__dirname, '../data', 'users.json'))
+      .then(
+        (data) => {
+          const userById = data.find((user) => user._id === req.params.id);
+          if (userById) {
+            res.send(userById);
+          } else {
+            res.status(404).send({ message: 'Нет пользователя с таким id' });
+          }
+        },
+        (error) => res.status(404).send({ message: error.message }),
+      );
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
 });
 
 module.exports = users;

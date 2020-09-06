@@ -1,17 +1,16 @@
-const fs = require('fs');
 const cards = require('express').Router();
-const path = require('path');
+const { getAllCards } = require('../helpers/read-file');
 
 cards.get('/cards', (req, res) => {
-  fs.readFile(path.join(__dirname, '../data', 'cards.json'), { encoding: 'utf-8' }, (err, data) => {
-    if (err) {
-      res.status(404).send({ message: err });
-      return;
-    }
-    const cardsData = JSON.parse(data);
-
-    res.send(cardsData);
-  });
+  try {
+    getAllCards('./data/cards.json')
+      .then(
+        (data) => res.send(data),
+        (error) => res.status(500).send({ message: error.message }),
+      );
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
 });
 
 module.exports = cards;
