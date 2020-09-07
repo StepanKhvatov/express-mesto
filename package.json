@@ -1,10 +1,10 @@
 {
   "name": "express-mesto",
   "version": "1.0.0",
-  "description": "",
+  "description": "Сервер для запуска проекта Место, разработанный при помощи express.js",
   "main": "app.js",
   "scripts": {
-    "start": "app.js",
+    "start": "node app.js",
     "dev": "nodemon app.js"
   },
   "repository": {
