@@ -24,8 +24,12 @@
     "nodemon": "^2.0.4"
   },
   "dependencies": {
+<<<<<<< HEAD
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "mongoose": "^5.10.6"
+=======
+    "express": "^4.17.1"
+>>>>>>> b8d7ba23d867dcc0cf0b3b113c50ddd951581e43
   }
 }
