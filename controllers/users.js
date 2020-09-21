@@ -1,30 +1,91 @@
-const path = require('path');
-const { readUsersJson } = require('../helpers/read-file');
+const UserSchema = require('../models/user');
 
-const getAllUsers = (req, res) => readUsersJson(path.join(__dirname, '..', 'data', 'users.json')) // Метод, возвращающий всех пользователей
-  .then(
-    (data) => res.send(data),
-  )
-  .catch(
-    (error) => res.status(500).send({ message: error.message }),
-  );
+const getAllUsers = (req, res) => { // Метод, возвращающий всех пользователей
+  UserSchema.find({})
+    .then((users) => res.send({ data: users }))
+    .catch((error) => res.status(500).send({ message: error.message }));
+};
 
-const getUserById = (req, res) => readUsersJson(path.join(__dirname, '..', 'data', 'users.json')) // Метод, возвращающий пользователя по id
-  .then(
-    (data) => {
-      const userById = data.find((user) => user._id === req.params.id);
-      if (userById) {
-        res.send(userById);
+const createUser = (req, res) => { // Метод создания пользователя
+  const { name, about, avatar } = req.body;
+
+  UserSchema.create({ name, about, avatar })
+    .then((user) => res.send({ data: user }))
+    .catch(
+      (error) => {
+        if (error.name === 'ValidationError') {
+          res.status(400).send({ message: error.message });
+        } else {
+          res.status(500).send({ message: error.message });
+        }
+      },
+    );
+};
+
+const getUserById = (req, res) => { // Метод, возвращающий пользователя по id
+  UserSchema.findById(req.params.userId)
+    .then((user) => {
+      if (user) {
+        res.send({ data: user });
       } else {
         res.status(404).send({ message: 'Нет пользователя с таким id' });
       }
+    })
+    .catch((error) => res.status(500).send({ message: error.message }));
+};
+
+const updateUser = (req, res) => { // метод, возвращающий обновленного пользователя
+  const { name, about } = req.body;
+
+  UserSchema.findByIdAndUpdate(
+    req.user._id,
+    { name, about },
+    {
+      new: true, // обработчик then получит на вход обновлённую запись
+      runValidators: true, // данные будут валидированы перед изменением
+      upsert: true, // если пользователь не найден, он будет создан
     },
   )
-  .catch(
-    (error) => res.status(500).send({ message: error.message }),
-  );
+    .then((user) => res.send({ data: user }))
+    .catch(
+      (error) => {
+        if (error.name === 'ValidationError') {
+          res.status(400).send({ message: error.message });
+        } else {
+          res.status(500).send({ message: error.message });
+        }
+      },
+    );
+};
+
+const updateAvatar = (req, res) => { // метод, возвращающий обновленный аватар
+  const { avatar } = req.body;
+
+  UserSchema.findByIdAndUpdate(
+    req.user._id,
+    { avatar },
+    {
+      new: true,
+      runValidators: true,
+      upsert: true,
+    },
+  )
+    .then((user) => res.send({ data: user.avatar }))
+    .catch(
+      (error) => {
+        if (error.name === 'ValidationError') {
+          res.status(400).send({ message: error.message });
+        } else {
+          res.status(500).send({ message: error.message });
+        }
+      },
+    );
+};
 
 module.exports = {
   getAllUsers,
   getUserById,
+  createUser,
+  updateUser,
+  updateAvatar,
 };
