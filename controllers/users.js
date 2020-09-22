@@ -24,14 +24,15 @@ const createUser = (req, res) => { // Метод создания пользов
 
 const getUserById = (req, res) => { // Метод, возвращающий пользователя по id
   UserSchema.findById(req.params.userId)
-    .then((user) => {
-      if (user) {
-        res.send({ data: user });
-      } else {
+    .orFail(new Error('NotValid'))
+    .then((user) => res.send({ data: user }))
+    .catch((error) => {
+      if (error.message === 'NotValid') {
         res.status(404).send({ message: 'Нет пользователя с таким id' });
+      } else {
+        res.status(500).send({ message: error.message });
       }
-    })
-    .catch((error) => res.status(500).send({ message: error.message }));
+    });
 };
 
 const updateUser = (req, res) => { // метод, возвращающий обновленного пользователя
@@ -46,16 +47,17 @@ const updateUser = (req, res) => { // метод, возвращающий об�
       upsert: true, // если пользователь не найден, он будет создан
     },
   )
+    .orFail(new Error('NotValid'))
     .then((user) => res.send({ data: user }))
-    .catch(
-      (error) => {
-        if (error.name === 'ValidationError') {
-          res.status(400).send({ message: error.message });
-        } else {
-          res.status(500).send({ message: error.message });
-        }
-      },
-    );
+    .catch((error) => {
+      if (error.name === 'NotValid') {
+        res.status(404).send({ message: 'Нет пользователя с таким id' });
+      } else if (error.name === 'ValidationError') {
+        res.status(400).send({ message: error.message });
+      } else {
+        res.status(500).send({ message: error.message });
+      }
+    });
 };
 
 const updateAvatar = (req, res) => { // метод, возвращающий обновленный аватар
@@ -70,16 +72,17 @@ const updateAvatar = (req, res) => { // метод, возвращающий о�
       upsert: true,
     },
   )
+    .orFail(new Error('NotValid'))
     .then((user) => res.send({ data: user.avatar }))
-    .catch(
-      (error) => {
-        if (error.name === 'ValidationError') {
-          res.status(400).send({ message: error.message });
-        } else {
-          res.status(500).send({ message: error.message });
-        }
-      },
-    );
+    .catch((error) => {
+      if (error.name === 'NotValid') {
+        res.status(404).send({ message: 'Нет пользователя с таким id' });
+      } else if (error.name === 'ValidationError') {
+        res.status(400).send({ message: error.message });
+      } else {
+        res.status(500).send({ message: error.message });
+      }
+    });
 };
 
 module.exports = {

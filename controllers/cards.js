@@ -28,16 +28,15 @@ const createCard = (req, res) => { // метод создания новой к�
 
 const deleteCard = (req, res) => { // метод удаления карточки
   CardSchema.findByIdAndRemove(req.params.cardId)
-    .then(
-      (card) => {
-        if (card) {
-          res.send({ data: card });
-        } else {
-          res.status(404).send({ message: 'Нет карточки с таким id' });
-        }
-      },
-    )
-    .catch((error) => res.status(500).send({ message: error.message }));
+    .orFail(new Error('NotValid'))
+    .then((card) => res.send({ data: card }))
+    .catch((error) => {
+      if (error.message === 'NotValid') {
+        res.status(404).send({ message: 'Нет карточки с таким id' });
+      } else {
+        res.status(500).send({ message: error.message });
+      }
+    });
 };
 
 const likeCard = (req, res) => { // Постановка лайка карточке
@@ -46,8 +45,15 @@ const likeCard = (req, res) => { // Постановка лайка карточ
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
+    .orFail(new Error('NotValid'))
     .then((card) => res.send({ data: card }))
-    .catch((error) => res.status(500).send({ message: error.message }));
+    .catch((error) => {
+      if (error.message === 'NotValid') {
+        res.status(404).send({ message: 'Нет карточки с таким id' });
+      } else {
+        res.status(500).send({ message: error.message });
+      }
+    });
 };
 
 const dislikeCard = (req, res) => { // Удаление лайка карточки
@@ -56,8 +62,15 @@ const dislikeCard = (req, res) => { // Удаление лайка карточ�
     { $pull: { likes: req.user._id } },
     { new: true },
   )
+    .orFail(new Error('NotValid'))
     .then((card) => res.send({ data: card }))
-    .catch((error) => res.status(500).send({ message: error.message }));
+    .catch((error) => {
+      if (error.message === 'NotValid') {
+        res.status(404).send({ message: 'Нет карточки с таким id' });
+      } else {
+        res.status(500).send({ message: error.message });
+      }
+    });
 };
 
 module.exports = {
