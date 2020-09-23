@@ -44,13 +44,12 @@ const updateUser = (req, res) => { // метод, возвращающий об�
     {
       new: true, // обработчик then получит на вход обновлённую запись
       runValidators: true, // данные будут валидированы перед изменением
-      upsert: true, // если пользователь не найден, он будет создан
     },
   )
     .orFail(new Error('NotValid'))
     .then((user) => res.send({ data: user }))
     .catch((error) => {
-      if (error.name === 'NotValid') {
+      if (error.message === 'NotValid') {
         res.status(404).send({ message: 'Нет пользователя с таким id' });
       } else if (error.name === 'ValidationError') {
         res.status(400).send({ message: error.message });
@@ -69,13 +68,12 @@ const updateAvatar = (req, res) => { // метод, возвращающий о�
     {
       new: true,
       runValidators: true,
-      upsert: true,
     },
   )
     .orFail(new Error('NotValid'))
     .then((user) => res.send({ data: user.avatar }))
     .catch((error) => {
-      if (error.name === 'NotValid') {
+      if (error.message === 'NotValid') {
         res.status(404).send({ message: 'Нет пользователя с таким id' });
       } else if (error.name === 'ValidationError') {
         res.status(400).send({ message: error.message });
